@@ -17,7 +17,7 @@ const useLoginFormAction = (reset) => {
       const response = await axiosInstance.post("user/login", formData);
 
       if (response?.data?.status === 200 && response?.data?.data) {
-        toast.success("Logged in Successfully");
+        toast.success("Logged in Successfully!");
         const user = response.data?.data;
         setUser(user);
         if (!user) {
