@@ -1,6 +1,10 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
 import "./globals.css";
-
+import { Toaster } from "@/components/ui/sonner";
+import QueryProvider from "@/providers/query-providers";
+import { AuthProvider } from "@/context/auth-context";
+import { SocketProvider } from "@/context/socket-context";
+import { ChatProvider } from "@/context/chat-context";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -8,6 +12,10 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+const nunito_Sans = Nunito_Sans({
+  variable: "--font-nunito-sans",
   subsets: ["latin"],
 });
 
@@ -20,9 +28,16 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${nunito_Sans.variable} antialiased font-nunito`}
       >
-        {children}
+        <AuthProvider>
+          <SocketProvider>
+            <ChatProvider>
+              <QueryProvider> {children}</QueryProvider>
+            </ChatProvider>
+          </SocketProvider>
+        </AuthProvider>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );
