@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 const PermissionsTable = ({
   permissions,
-  selectedPermissions,
+  isEffectiveChecked,
   handlePermissionSelection,
 }) => (
   <div className="border rounded-lg p-4 shadow-lg overflow-x-auto">
@@ -32,7 +32,7 @@ const PermissionsTable = ({
           <TableRow key={perm._id}>
             <TableCell>
               <Checkbox
-                checked={selectedPermissions.includes(perm._id)}
+                checked={isEffectiveChecked(perm._id)}
                 onCheckedChange={() => handlePermissionSelection(perm._id)}
               />
             </TableCell>

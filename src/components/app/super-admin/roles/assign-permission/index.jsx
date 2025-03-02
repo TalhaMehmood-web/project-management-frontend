@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,10 +11,12 @@ import {
   assignPermissionsApi,
 } from "./queries";
 import formatRoleName from "@/utils/formateRoleName";
-const AssignPermissionCard = ({ id }) => {
-  const [selectedPermissions, setSelectedPermissions] = useState([]);
 
-  // 🚀 Get all permissions
+const AssignPermissionCard = ({ id }) => {
+  // This state holds only the permissions the user clicked (toggled)
+  const [clickedPermissions, setClickedPermissions] = useState([]);
+
+  // Fetch all available permissions
   const {
     data: permissions,
     isLoading,
@@ -24,34 +26,38 @@ const AssignPermissionCard = ({ id }) => {
     queryFn: fetchPermissions,
   });
 
-  // 🚀 Get assigned permissions for the role
+  // Fetch the role details (including its default permissions)
   const { data: role, refetch: refetchRolePermissions } = useQuery({
     queryKey: ["getRoleById", id],
     queryFn: () => fetchRoleById(id),
   });
 
-  useEffect(() => {
-    if (role?.permissions && permissions) {
-      const matchedPermissions = permissions
-        .filter((perm) => role?.permissions.includes(perm._id))
-        .map((perm) => perm._id);
-      setSelectedPermissions(matchedPermissions);
-    }
-  }, [role?.permissions, permissions]);
+  // Compute the effective state for a permission:
+  // If it is default selected, then it should be checked unless toggled;
+  // if it’s not default selected, it should be unchecked unless toggled.
+  const isEffectiveChecked = (permissionId) => {
+    const isDefault = role?.permissions.includes(permissionId);
+    const isToggled = clickedPermissions.includes(permissionId);
+    return isDefault ? !isToggled : isToggled;
+  };
 
+  // When a permission is clicked, toggle its presence in the clickedPermissions state.
   const handlePermissionSelection = (permissionId) => {
-    setSelectedPermissions((prevSelected) =>
-      prevSelected.includes(permissionId)
-        ? prevSelected.filter((id) => id !== permissionId)
-        : [...prevSelected, permissionId]
+    setClickedPermissions((prev) =>
+      prev.includes(permissionId)
+        ? prev.filter((id) => id !== permissionId)
+        : [...prev, permissionId]
     );
   };
 
-  // ⚡ Assign permissions mutation
+  // Mutation to assign permissions.
+  // Note that we send only the clicked permissions.
   const { mutate: assignPermissions, isLoading: isAssigning } = useMutation({
     mutationFn: assignPermissionsApi,
     onSuccess: async () => {
       await refetchRolePermissions();
+      // Optionally reset the clickedPermissions state after successful update.
+      setClickedPermissions([]);
     },
     onError: (error) => {
       toast.error(
@@ -60,11 +66,12 @@ const AssignPermissionCard = ({ id }) => {
     },
   });
 
+  // Submit only the toggled (clicked) permissions to the backend.
   const handleAssignPermission = () => {
     toast.promise(
       new Promise((resolve, reject) => {
         assignPermissions(
-          { roleId: id, permissions: selectedPermissions },
+          { roleId: id, permissions: clickedPermissions },
           { onSuccess: resolve, onError: reject }
         );
       }),
@@ -81,7 +88,7 @@ const AssignPermissionCard = ({ id }) => {
   if (isLoading)
     return (
       <div className="flex flex-1 justify-center items-center">
-        <Loader2 size={40} className="animate-spin" />{" "}
+        <Loader2 size={40} className="animate-spin" />
       </div>
     );
   if (isError) return <div>Error loading permissions. Please try again.</div>;
@@ -93,7 +100,6 @@ const AssignPermissionCard = ({ id }) => {
           <h2 className="text-xl font-semibold text-primary mb-4">
             Assign Permission
           </h2>
-
           <p className="bg-green-200/50 rounded-lg py-1 px-3 font-semibold text-sm text-green-800 w-fit">
             {formatRoleName(role?.name).toUpperCase()}
           </p>
@@ -111,7 +117,7 @@ const AssignPermissionCard = ({ id }) => {
 
       <PermissionsTable
         permissions={permissions}
-        selectedPermissions={selectedPermissions}
+        isEffectiveChecked={isEffectiveChecked}
         handlePermissionSelection={handlePermissionSelection}
       />
     </div>
