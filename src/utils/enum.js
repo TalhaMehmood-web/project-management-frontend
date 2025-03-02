@@ -4,4 +4,5 @@ export const ROLES = {
   EMPLOYESS: "employee",
   CLINET: "client",
   NOT_IDENTIFIED: "not_identified",
+  GUEST: "guest",
 };

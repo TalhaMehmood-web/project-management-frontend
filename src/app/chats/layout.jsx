@@ -6,6 +6,8 @@ import VerificationGuard from "@/providers/verification-guard-providers";
 import BackToDashboardButton from "@/components/shared/molecules/back-to-dashboard-button";
 import VerificationCheckDialog from "@/components/shared/dialogs/verification-check-dialog";
 import NotificationBellIcon from "@/components/shared/ui/navbar/notification-bell.icon";
+import PageProtection from "@/providers/page-protection";
+import { AbilityProvider } from "@/providers/ability-provider";
 
 const ChatsLayout = ({ children }) => {
   return (
@@ -19,7 +21,11 @@ const ChatsLayout = ({ children }) => {
             </VerificationGuard>
             <NotificationBellIcon />
           </NavbarWrapper>
-          <div className="flex flex-1 ">{children}</div>
+          <AbilityProvider>
+            <PageProtection>
+              <div className="flex flex-1 ">{children}</div>
+            </PageProtection>
+          </AbilityProvider>
         </div>
       </div>
       <VerificationCheckDialog />

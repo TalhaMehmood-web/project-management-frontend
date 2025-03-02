@@ -5,6 +5,7 @@ import QueryProvider from "@/providers/query-providers";
 import { AuthProvider } from "@/context/auth-context";
 import { SocketProvider } from "@/context/socket-context";
 import { ChatProvider } from "@/context/chat-context";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -33,7 +34,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <SocketProvider>
             <ChatProvider>
-              <QueryProvider> {children}</QueryProvider>
+              <QueryProvider>{children}</QueryProvider>
             </ChatProvider>
           </SocketProvider>
         </AuthProvider>

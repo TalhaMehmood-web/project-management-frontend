@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/axios";
 
 const usePaginatedTableData = (endpoint, initialFilters = {}) => {
-  const [filters, setFilters] = useState();
+  const [filters, setFilters] = useState({});
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [sorting, setSorting] = useState([]);
@@ -15,7 +15,7 @@ const usePaginatedTableData = (endpoint, initialFilters = {}) => {
       page: pageIndex,
       pageSize,
     });
-    console.log("res", response.data);
+
     return response.data?.data;
   };
 
