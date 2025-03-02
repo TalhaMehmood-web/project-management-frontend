@@ -3,14 +3,14 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { UserPlus } from "lucide-react";
+import { Loader2, UserPlus } from "lucide-react";
 import PermissionsTable from "./permission-table";
 import {
   fetchPermissions,
   fetchRoleById,
   assignPermissionsApi,
 } from "./queries";
-
+import formatRoleName from "@/utils/formateRoleName";
 const AssignPermissionCard = ({ id }) => {
   const [selectedPermissions, setSelectedPermissions] = useState([]);
 
@@ -78,15 +78,26 @@ const AssignPermissionCard = ({ id }) => {
     );
   };
 
-  if (isLoading) return <div>Loading permissions...</div>;
+  if (isLoading)
+    return (
+      <div className="flex flex-1 justify-center items-center">
+        <Loader2 size={40} className="animate-spin" />{" "}
+      </div>
+    );
   if (isError) return <div>Error loading permissions. Please try again.</div>;
 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex w-full justify-between items-center flex-wrap p-2">
-        <h2 className="text-xl font-semibold text-primary mb-4">
-          Assign Permission
-        </h2>
+        <div className="flex items-start gap-4">
+          <h2 className="text-xl font-semibold text-primary mb-4">
+            Assign Permission
+          </h2>
+
+          <p className="bg-green-200/50 rounded-lg py-1 px-3 font-semibold text-sm text-green-800 w-fit">
+            {formatRoleName(role?.name).toUpperCase()}
+          </p>
+        </div>
         <Button
           onClick={handleAssignPermission}
           disabled={isAssigning}
@@ -97,7 +108,7 @@ const AssignPermissionCard = ({ id }) => {
           <UserPlus /> Assign To a Role
         </Button>
       </div>
-      <div>Assigned To : {role?.name}</div>
+
       <PermissionsTable
         permissions={permissions}
         selectedPermissions={selectedPermissions}

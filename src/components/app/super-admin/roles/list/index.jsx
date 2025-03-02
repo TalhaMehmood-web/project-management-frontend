@@ -3,8 +3,8 @@ import PaginatedTable from "@/components/shared/molecules/paginated-table";
 import React, { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
-import ManageAdminRowsOptions from "../../manage/list/rowsOptions";
 import ManageListRowsOptions from "./rowsOptions";
+
 const ListRolesComponent = () => {
   const columns = useMemo(
     () => [
