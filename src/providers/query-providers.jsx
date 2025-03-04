@@ -1,8 +1,9 @@
 // src/providers/QueryProvider.js
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 
 // Optionally configure default query options
 const queryClient = new QueryClient({
@@ -15,6 +16,14 @@ const queryClient = new QueryClient({
 
 export default function QueryProvider({ children }) {
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <Suspense
+      fallback={
+        <div className="min-h-screen w-full flex justify-center items-center">
+          <Loader2 className="animate-spin" size={40} />
+        </div>
+      }
+    >
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </Suspense>
   );
 }

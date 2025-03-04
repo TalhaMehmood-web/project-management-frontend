@@ -11,18 +11,20 @@ import {
   assignPermissionsApi,
 } from "./queries";
 import formatRoleName from "@/utils/formateRoleName";
+import { TypeSwitcher } from "./type-switcher";
+import { useAssignPermissionToRole } from "@/context/assign-permission-to-role-context";
 
 const AssignPermissionCard = ({ id }) => {
   // Tracks only the permissions the user has toggled
   const [clickedPermissions, setClickedPermissions] = useState([]);
-
+  const { selectedPermissionType } = useAssignPermissionToRole();
   const {
     data: permissions,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["getAllPermissions"],
-    queryFn: fetchPermissions,
+    queryKey: ["getAllPermissions", selectedPermissionType],
+    queryFn: () => fetchPermissions(selectedPermissionType),
   });
 
   const { data: role, refetch: refetchRolePermissions } = useQuery({
@@ -151,18 +153,20 @@ const AssignPermissionCard = ({ id }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex w-full justify-between items-center flex-wrap p-2">
-        <div className="flex items-start gap-4">
-          <h2 className="text-xl font-semibold text-primary mb-4">
-            Assign Permission
-          </h2>
-          <p className="bg-green-200/50 rounded-lg py-1 px-3 font-semibold text-sm text-green-800 w-fit">
-            {formatRoleName(role?.name).toUpperCase()}
-          </p>
-        </div>
+      <div className="flex items-start gap-4">
+        <h2 className="text-xl font-semibold text-primary mb-4">
+          Assign Permission
+        </h2>
+        <p className="bg-green-200/50 rounded-lg py-1 px-3 font-semibold text-sm text-green-800 w-fit">
+          {formatRoleName(role?.name).toUpperCase()}
+        </p>
+      </div>
+      <div className="flex w-full items-center justify-between">
+        <TypeSwitcher />
+
         <Button
           onClick={handleAssignPermission}
-          disabled={isAssigning}
+          disabled={isAssigning || !clickedPermissions.length}
           className="hover:bg-transparent hover:text-green-500"
           size="lg"
           variant="success"
@@ -170,7 +174,6 @@ const AssignPermissionCard = ({ id }) => {
           <UserPlus /> Assign To a Role
         </Button>
       </div>
-
       <PermissionsTable
         permissions={permissions}
         effectiveStates={effectiveStates}

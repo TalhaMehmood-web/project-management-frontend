@@ -1,6 +1,13 @@
 "use client";
-import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
 import SidebarCollapsible from "./side-bar-collapsible";
+import Link from "next/link";
+import { LayoutDashboard } from "lucide-react";
 
 const projectItems = [
   {
@@ -44,6 +51,14 @@ export default function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
+        <SidebarMenuItem className="p-2">
+          <SidebarMenuButton asChild>
+            <Link href="/admin/dashboard" className="flex items-center gap-2">
+              <LayoutDashboard className="w-5 h-5" />
+              <span>Dashboard</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
         <SidebarCollapsible title="Users" items={usersItem} />
         <SidebarCollapsible title="Projects" items={projectItems} />
         <SidebarCollapsible
