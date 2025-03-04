@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useAssignPermissionToRole } from "@/context/assign-permission-to-role-context";
 
 const PermissionsTable = ({
   permissions,
@@ -16,43 +17,58 @@ const PermissionsTable = ({
   handlePermissionSelection,
   handleHeaderCheckboxChange,
   allEffectiveChecked,
-}) => (
-  <div className="border rounded-lg p-4 shadow-lg overflow-x-auto">
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>
-            <Checkbox
-              checked={allEffectiveChecked}
-              onCheckedChange={handleHeaderCheckboxChange}
-            />
-          </TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Endpoint</TableHead>
-          <TableHead>Controller</TableHead>
-          <TableHead>Method</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {permissions?.map((perm) => (
-          <TableRow key={perm._id}>
-            <TableCell>
+}) => {
+  const { selectedPermissionType } = useAssignPermissionToRole();
+  return (
+    <div className="border rounded-lg p-4 shadow-lg overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>
               <Checkbox
-                checked={effectiveStates[perm._id]}
-                onCheckedChange={() => handlePermissionSelection(perm._id)}
+                checked={allEffectiveChecked}
+                onCheckedChange={handleHeaderCheckboxChange}
               />
-            </TableCell>
-            <TableCell>{perm.name}</TableCell>
-            <TableCell>{perm.type}</TableCell>
-            <TableCell>{perm.endpoint || "-"}</TableCell>
-            <TableCell>{perm.controller || "-"}</TableCell>
-            <TableCell>{perm.method || "-"}</TableCell>
+            </TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Type</TableHead>
+            {selectedPermissionType === "api" ? (
+              <>
+                <TableHead>Endpoint</TableHead>
+                <TableHead>Controller</TableHead>
+                <TableHead>Method</TableHead>
+              </>
+            ) : (
+              <TableHead>Page Path</TableHead>
+            )}
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </div>
-);
+        </TableHeader>
+        <TableBody>
+          {permissions?.map((perm) => (
+            <TableRow key={perm._id}>
+              <TableCell>
+                <Checkbox
+                  checked={effectiveStates[perm._id]}
+                  onCheckedChange={() => handlePermissionSelection(perm._id)}
+                />
+              </TableCell>
+              <TableCell>{perm.name}</TableCell>
+              <TableCell>{perm.type}</TableCell>
+              {selectedPermissionType === "api" ? (
+                <>
+                  <TableCell>{perm.endpoint || "-"}</TableCell>
+                  <TableCell>{perm.controller || "-"}</TableCell>
+                  <TableCell>{perm.method || "-"}</TableCell>
+                </>
+              ) : (
+                <TableCell>{perm.pagePath || "-"}</TableCell>
+              )}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+};
 
 export default PermissionsTable;

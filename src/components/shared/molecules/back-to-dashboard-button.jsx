@@ -9,7 +9,7 @@ const BackToDashboardButton = () => {
   const redirectLink =
     user?.role === ROLES.SUPER_ADMIN
       ? "/super-admin/manage/list"
-      : "/admin/users/list";
+      : "/admin/dashboard";
   return (
     <>
       <Link href={redirectLink}>

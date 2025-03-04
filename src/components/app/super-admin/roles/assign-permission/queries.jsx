@@ -1,8 +1,16 @@
 import axiosInstance from "@/axios";
 
 // 🔄 Fetch all permissions
-export const fetchPermissions = async () => {
-  const { data } = await axiosInstance.post("/permissions/get-all-permissions");
+export const fetchPermissions = async (selectedPermissionType) => {
+  const { data } = await axiosInstance.post(
+    "/permissions/get-all-permissions",
+    {
+      filters: {
+        name: "",
+        type: selectedPermissionType,
+      },
+    }
+  );
   return data?.data?.permissions || [];
 };
 

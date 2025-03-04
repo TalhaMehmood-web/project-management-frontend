@@ -1,7 +1,14 @@
 "use client";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, KeyRound, Eye, UserX, Edit } from "lucide-react";
+import {
+  MoreVertical,
+  KeyRound,
+  Eye,
+  UserX,
+  Edit,
+  KeyIcon,
+} from "lucide-react";
 import axiosInstance from "@/axios";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -17,11 +24,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ROLES } from "@/utils/enum";
+import AssignPermissionToUserModal from "./assign-permission-to-user-modal";
 
 const ManageAdminRowsOptions = ({ row }) => {
   const queryClient = useQueryClient();
   const [openAssignRoleDialog, setOpenAssignRoleDialog] = useState(false);
   const [openActionDropdown, setOpenActionDropdown] = useState(false);
+  const [
+    openAssignPermissionToUserDialog,
+    setOpenAssignPermissionToUserDialog,
+  ] = useState(false);
   const handleUserAction = (actionType, userId, successMessage) => {
     const apiCall = axiosInstance.put(
       `${USER_PERMISSION_API[actionType]}/${userId}`
@@ -52,8 +64,16 @@ const ManageAdminRowsOptions = ({ row }) => {
     );
   const handleAssignRole = () => {
     if (openActionDropdown) {
+      setOpenAssignPermissionToUserDialog(false);
       setOpenActionDropdown(false);
       setOpenAssignRoleDialog(true);
+    }
+  };
+  const handleAssignPermission = () => {
+    if (openActionDropdown) {
+      setOpenActionDropdown(false);
+      setOpenAssignRoleDialog(false);
+      setOpenAssignPermissionToUserDialog(true);
     }
   };
   return (
@@ -88,6 +108,11 @@ const ManageAdminRowsOptions = ({ row }) => {
               {row?.role?.name === ROLES.GUEST ? "Assign Role" : "Change Role"}
             </DropdownMenuItem>
           )}
+          {row?.isVerified && (
+            <DropdownMenuItem onClick={handleAssignPermission}>
+              <KeyIcon /> Assign Permission
+            </DropdownMenuItem>
+          )}
           <Link href={`/admin/users/overview/${row?._id}`}>
             <DropdownMenuItem>
               <Eye /> View
@@ -103,6 +128,11 @@ const ManageAdminRowsOptions = ({ row }) => {
       <AssignRoleDialog
         open={openAssignRoleDialog}
         setOpen={setOpenAssignRoleDialog}
+        rowUser={row}
+      />
+      <AssignPermissionToUserModal
+        open={openAssignPermissionToUserDialog}
+        setOpen={setOpenAssignPermissionToUserDialog}
         rowUser={row}
       />
     </React.Fragment>
